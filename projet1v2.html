@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXORA Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root { --gold: #C9A84C; --bg: #050505; --text: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { border: 2px solid rgba(201, 168, 76, 0.3); border-top: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Magnetic Cursor */
+        .cursor { position: fixed; width: 20px; height: 20px; border: 1px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 10000; transition: transform 0.1s; transform: translate(-50%, -50%); mix-blend-mode: difference; }
+
+        /* Navbar */
+        nav { position: fixed; width: 100%; padding: 2rem; display: flex; justify-content: space-between; z-index: 100; mix-blend-mode: difference; }
+        .back-btn { color: var(--gold); text-decoration: none; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; border: 1px solid var(--gold); padding: 10px 20px; border-radius: 30px; transition: 0.3s;}
+        .back-btn:hover { background: var(--gold); color: var(--bg); }
+
+        /* Hero */
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.6; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5rem; pointer-events: none;}
+        h1 { font-size: 6rem; text-transform: uppercase; line-height: 1; margin-bottom: 1rem; }
+        h1 span { color: transparent; -webkit-text-stroke: 1px var(--gold); }
+
+        /* Sections */
+        section { padding: 8rem 5rem; }
+        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(201,168,76,0.2); padding: 3rem; border-radius: 10px; transition: transform 0.5s; }
+        .glass-card:hover { transform: rotateY(10deg) rotateX(10deg); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; perspective: 1000px; }
+
+        /* Floats */
+        .float-btn { position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; text-decoration: none; z-index: 100; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.7); } 70% { box-shadow: 0 0 0 20px rgba(0,0,0,0); } }
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="spinner"></div></div>
+    <div class="cursor" id="cursor"></div>
+    <div id="canvas-container"></div>
+
+    <nav>
+        <h2>NEXORA <span style="color:var(--gold)">ARCH</span></h2>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Portfolio</a>
+    </nav>
+
+    <header class="hero">
+        <h1 data-aos="fade-up">Shaping<br><span>Tomorrow's</span><br>Skyline</h1>
+        <p data-aos="fade-up" data-aos-delay="200" style="max-width: 400px; color: #aaa;">Luxury structural engineering and visionary architectural design for the modern era.</p>
+    </header>
+
+    <section>
+        <h2 style="font-size: 3rem; margin-bottom: 3rem; color: var(--gold);" data-aos="fade-right">Featured Projects</h2>
+        <div class="grid">
+            <div class="glass-card" data-aos="fade-up"><h3>The Obsidian Tower</h3><p style="margin-top: 1rem; color:#aaa">Commercial / Dubai</p></div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="100"><h3>Aura Residences</h3><p style="margin-top: 1rem; color:#aaa">Residential / Monaco</p></div>
+            <div class="glass-card" data-aos="fade-up" data-aos-delay="200"><h3>Nexus Bridge</h3><p style="margin-top: 1rem; color:#aaa">Infrastructure / Tokyo</p></div>
+        </div>
+    </section>
+
+    <section id="contact" style="text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="font-size: 3rem; margin-bottom: 2rem;">Initiate a Project</h2>
+        <a href="mailto:hammouda.bouhlal06@gmail.com" class="back-btn" style="background: var(--gold); color: var(--bg);">Email Us</a>
+    </section>
+
+    <a href="https://wa.me/212701559357" target="_blank" class="float-btn"><i class="fab fa-whatsapp"></i></a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Loader & AOS
+        window.addEventListener('load', () => {
+            document.getElementById('loader').style.display = 'none';
+            AOS.init({ duration: 1000, once: true });
+        });
+
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Three.js Wireframe Architecture
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Create abstract building
+        const geometry = new THREE.BoxGeometry(3, 10, 3);
+        const edges = new THREE.EdgesGeometry(geometry);
+        const material = new THREE.LineBasicMaterial({ color: 0xC9A84C, linewidth: 2 });
+        const building = new THREE.LineSegments(edges, material);
+        scene.add(building);
+
+        const geo2 = new THREE.BoxGeometry(5, 5, 5);
+        const edges2 = new THREE.EdgesGeometry(geo2);
+        const build2 = new THREE.LineSegments(edges2, material);
+        build2.position.y = -2.5;
+        scene.add(build2);
+
+        camera.position.z = 12;
+        camera.position.y = 2;
+        camera.rotation.x = -0.2;
+
+        let mouseX = 0;
+        document.addEventListener('mousemove', e => { mouseX = (e.clientX / window.innerWidth) * 2 - 1; });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            building.rotation.y += 0.005;
+            build2.rotation.y -= 0.003;
+            scene.rotation.y += (mouseX * 0.5 - scene.rotation.y) * 0.05; // Parallax
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
