@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRON BEAST | Premium Gym</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root { --red: #FF2020; --black: #0A0A0A; --white: #FFFFFF; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); overflow-x: hidden; }
+        h1, h2, h3, .bebas { font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        
+        #loader { position: fixed; inset: 0; background: var(--black); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--red); border-right-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        nav { position: fixed; width: 100%; padding: 1.5rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(10,10,10,0.8); backdrop-filter: blur(10px); border-bottom: 2px solid var(--red); }
+        .logo { font-size: 2.5rem; color: var(--white); text-decoration: none; text-shadow: 2px 2px 0px var(--red); }
+        .btn-back { color: var(--white); text-decoration: none; font-weight: 900; border: 2px solid var(--white); padding: 8px 20px; transition: 0.3s; text-transform: uppercase; }
+        .btn-back:hover { background: var(--white); color: var(--black); }
+
+        #canvas-container { position: absolute; inset: 0; z-index: 0; opacity: 0.7; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; z-index: 10; text-align: center; background: radial-gradient(circle, rgba(255,32,32,0.1) 0%, rgba(10,10,10,1) 80%); pointer-events: none; }
+        
+        .glitch-title { font-size: 8rem; color: var(--white); position: relative; display: inline-block; text-shadow: 4px 4px 0px var(--red); }
+        .glitch-title::before, .glitch-title::after { content: "FORGE YOUR LEGACY"; position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: var(--black); }
+        .glitch-title::before { left: 3px; text-shadow: -2px 0 red; clip: rect(24px, 800px, 90px, 0); animation: glitch-anim 2s infinite linear alternate-reverse; }
+        .glitch-title::after { left: -3px; text-shadow: -2px 0 blue; clip: rect(85px, 800px, 140px, 0); animation: glitch-anim 2.5s infinite linear alternate-reverse; }
+        @keyframes glitch-anim { 0% { clip: rect(10px, 9999px, 44px, 0); } 100% { clip: rect(40px, 9999px, 90px, 0); } }
+
+        .btn-red { background: var(--red); color: var(--white); padding: 15px 40px; font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; text-decoration: none; border: none; cursor: pointer; pointer-events: auto; position: relative; overflow: hidden; transition: 0.3s; box-shadow: 0 0 20px rgba(255,32,32,0.4); text-transform: uppercase;}
+        .btn-red:hover { transform: scale(1.05) skewX(-10deg); box-shadow: 0 0 40px rgba(255,32,32,0.8); }
+
+        /* Sticky Modal Trigger */
+        .sticky-join { position: fixed; right: -40px; top: 50%; transform: translateY(-50%) rotate(-90deg); z-index: 1000; padding: 10px 30px; letter-spacing: 2px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: #111; padding: 3rem; border: 2px solid var(--red); width: 90%; max-width: 500px; text-align: center; position: relative;}
+        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--red); }
+
+        section { padding: 6rem 5%; position: relative; z-index: 10; border-top: 1px solid rgba(255,255,255,0.05); }
+        .stats { display: flex; justify-content: space-around; background: #111; padding: 4rem 0; flex-wrap: wrap; gap: 2rem;}
+        .stat-box { text-align: center; }
+        .stat-box h3 { font-size: 4rem; color: var(--red); }
+        .stat-box p { font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: #888; }
+
+        .programs-grid, .coaches-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem; perspective: 1000px; }
+        .flip-card { width: 100%; height: 400px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer; }
+        .flip-card:hover { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid #222; }
+        .flip-card-front { background: linear-gradient(to bottom, transparent, #111), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover; }
+        .flip-card-front h3 { font-size: 3rem; text-shadow: 2px 2px 10px #000; }
+        .flip-card-back { background: var(--red); transform: rotateY(180deg); padding: 2rem; text-align: center; }
+        
+        .tilt-card { background: #111; border: 1px solid #333; padding: 2rem; text-align: center; transition: 0.3s; }
+        .tilt-card:hover { border-color: var(--red); box-shadow: 0 0 20px rgba(255,32,32,0.2); }
+        .tilt-card img { width: 100%; height: 250px; object-fit: cover; filter: grayscale(100%); transition: 0.3s; margin-bottom: 1rem;}
+        .tilt-card:hover img { filter: grayscale(0%); }
+
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
+        .price-card { border: 2px solid #222; padding: 3rem 2rem; text-align: center; transition: 0.3s; background: #0A0A0A; }
+        .price-card:hover { border-color: var(--red); transform: translateY(-10px); }
+        .price-card h3 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .price-card .price { font-size: 4rem; color: var(--red); font-family: 'Bebas Neue'; }
+
+        .float-btn { position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; text-decoration: none; z-index: 100; animation: pulse 2s infinite; }
+        .float-mail { bottom: 100px; background: var(--red); animation: none; transition: 0.3s; }
+        .float-mail:hover { transform: translateX(-10px); }
+        /* --- RESPONSIVE OVERRIDES --- */
+img { max-width: 100%; height: auto; display: block; }
+section { padding: clamp(4rem, 8vw, 6rem) 5%; }
+.glitch-title { font-size: clamp(3.5rem, 10vw, 8rem); line-height: 1; }
+.programs-grid, .coaches-grid, .pricing-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.stats { padding: clamp(2rem, 5vw, 4rem) 5%; flex-wrap: wrap; gap: 2rem; }
+.stat-box { flex: 1; min-width: 120px; }
+.stat-box h3 { font-size: clamp(2.5rem, 6vw, 4rem); }
+nav { flex-wrap: wrap; padding: clamp(1rem, 2vw, 1.5rem) 5%; gap: 1rem; }
+.float-btn { width: clamp(50px, 8vw, 60px); height: clamp(50px, 8vw, 60px); font-size: clamp(1.5rem, 4vw, 2rem); }
+
+@media (max-width: 768px) {
+    .sticky-join { top: auto; bottom: 0; right: 0; transform: none; width: 100%; text-align: center; }
+    .glitch-title::before, .glitch-title::after { display: none; } /* Disables glitch effect on mobile to prevent text wrapping bugs */
+    .flip-card { aspect-ratio: auto; min-height: 350px; }
+}
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="spinner"></div></div>
+    <div id="canvas-container"></div>
+
+    <nav>
+        <a href="#" class="logo">IRON<span style="color:var(--red);">BEAST</span></a>
+        <a href="index.html" class="btn-back">Return to Portfolio</a>
+    </nav>
+
+    <button class="btn-red sticky-join" onclick="document.getElementById('joinModal').style.display='flex'">JOIN NOW</button>
+
+    <div id="joinModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('joinModal').style.display='none'">&times;</span>
+            <h2 style="font-size: 3rem; margin-bottom: 1rem;">SECURE YOUR SPOT</h2>
+            <input type="text" placeholder="Full Name" style="width:100%; padding: 15px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white;">
+            <input type="email" placeholder="Email Address" style="width:100%; padding: 15px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white;">
+            <button class="btn-red" style="width:100%; margin-top: 0;">Submit Application</button>
+        </div>
+    </div>
+
+    <header class="hero">
+        <h1 class="glitch-title" data-aos="zoom-in">FORGE YOUR LEGACY</h1>
+        <p style="font-size: 1.2rem; max-width: 600px; margin-top: 1rem; font-weight: 600; color: #ccc;">No excuses. No limits. Only results. Join the elite fitness facility in Casablanca designed for those who demand more.</p>
+    </header>
+
+    <div class="stats">
+        <div class="stat-box"><h3 class="counter" data-target="5000">0</h3><p>Active Beasts</p></div>
+        <div class="stat-box"><h3 class="counter" data-target="24">0</h3><p>Hours Open</p></div>
+        <div class="stat-box"><h3 class="counter" data-target="150">0</h3><p>Elite Equipment</p></div>
+    </div>
+
+    <section id="programs">
+        <h2 style="font-size: 4rem; text-align: center;">Training <span style="color:var(--red);">Disciplines</span></h2>
+        <div class="programs-grid">
+            <div class="flip-card" data-aos="fade-up">
+                <div class="flip-card-front"><h3>Strength</h3></div>
+                <div class="flip-card-back"><h3 style="font-size: 2rem; margin-bottom: 1rem;">Powerlifting</h3><p>Olympic platforms, calibrated plates, specialized machines.</p></div>
+            </div>
+            <div class="flip-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="flip-card-front" style="background-image: linear-gradient(to bottom, transparent, #111), url('https://images.unsplash.com/photo-1599058945522-28d584b6f4ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');"><h3>CrossFit</h3></div>
+                <div class="flip-card-back"><h3 style="font-size: 2rem; margin-bottom: 1rem;">Functional</h3><p>High-intensity WODs to push your endurance to the max.</p></div>
+            </div>
+            <div class="flip-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="flip-card-front" style="background-image: linear-gradient(to bottom, transparent, #111), url('https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');"><h3>HIIT</h3></div>
+                <div class="flip-card-back"><h3 style="font-size: 2rem; margin-bottom: 1rem;">Shred & Burn</h3><p>Explosive cardio designed to incinerate fat.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="coaches" style="background: #111;">
+        <h2 style="font-size: 4rem; text-align: center;">Elite <span style="color:var(--red);">Coaches</span></h2>
+        <div class="coaches-grid">
+            <div class="tilt-card" data-aos="fade-right">
+                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Coach">
+                <h3 style="font-size: 2rem;">Marcus Kane</h3><p style="color: var(--red); font-weight: 600;">Head of Strength</p>
+            </div>
+            <div class="tilt-card" data-aos="fade-up">
+                <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Coach">
+                <h3 style="font-size: 2rem;">Sarah Connor</h3><p style="color: var(--red); font-weight: 600;">CrossFit Lead</p>
+            </div>
+            <div class="tilt-card" data-aos="fade-left">
+                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Coach">
+                <h3 style="font-size: 2rem;">David Thorne</h3><p style="color: var(--red); font-weight: 600;">Conditioning</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <h2 style="font-size: 4rem; text-align: center;">Membership <span style="color:var(--red);">Tiers</span></h2>
+        <div class="pricing-grid">
+            <div class="price-card" data-aos="zoom-in">
+                <h3>Base Pass</h3>
+                <div class="price">$49<span style="font-size: 1rem; color: #888; font-family: 'Inter';">/mo</span></div>
+                <p style="margin: 2rem 0; color: #aaa;">Access to all weight and cardio zones 24/7.</p>
+                <button class="btn-red" style="width: 100%;">Select</button>
+            </div>
+            <div class="price-card" data-aos="zoom-in" data-aos-delay="100" style="border-color: var(--red); transform: scale(1.05);">
+                <h3>Elite Pack</h3>
+                <div class="price">$89<span style="font-size: 1rem; color: #888; font-family: 'Inter';">/mo</span></div>
+                <p style="margin: 2rem 0; color: #aaa;">Full access + Unlimited Group Classes + Recovery Zone.</p>
+                <button class="btn-red" style="width: 100%;">Select</button>
+            </div>
+            <div class="price-card" data-aos="zoom-in" data-aos-delay="200">
+                <h3>Beast Mode</h3>
+                <div class="price">$149<span style="font-size: 1rem; color: #888; font-family: 'Inter';">/mo</span></div>
+                <p style="margin: 2rem 0; color: #aaa;">All benefits + 4 Personal Training sessions per month.</p>
+                <button class="btn-red" style="width: 100%;">Select</button>
+            </div>
+        </div>
+    </section>
+
+    <section style="height: 400px; display: flex; align-items: center; justify-content: center;">
+        <!-- Placeholder for Map -->
+        <h2 style="font-size: 3rem;">VISIT US IN <span style="color:var(--red);">CASABLANCA</span></h2>
+    </section>
+
+    <a href="mailto:hammouda.bouhlal06@gmail.com" class="float-btn float-mail"><i class="fas fa-envelope"></i></a>
+    <a href="https://wa.me/212701559357" target="_blank" class="float-btn"><i class="fab fa-whatsapp"></i></a>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        window.addEventListener('load', () => {
+            document.getElementById('loader').style.display = 'none';
+            AOS.init({ duration: 1000, once: true });
+
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                gsap.to(counter, { innerHTML: counter.getAttribute('data-target'), duration: 2.5, ease: "power2.out", snap: { innerHTML: 1 }, scrollTrigger: counter });
+            });
+        });
+
+        // Tilt logic for coaches
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                card.style.transform = `perspective(1000px) rotateX(${(y - rect.height/2) / -10}deg) rotateY(${(x - rect.width/2) / 10}deg)`;
+            });
+            card.addEventListener('mouseleave', () => card.style.transform = 'none');
+        });
+
+        // Three.js Barbell + Dust
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const partGeo = new THREE.BufferGeometry();
+        const partPos = new Float32Array(1000 * 3);
+        for(let i=0; i<3000; i++) { partPos[i] = (Math.random() - 0.5) * 20; }
+        partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+        const particles = new THREE.Points(partGeo, new THREE.PointsMaterial({ size: 0.05, color: 0xFF2020, transparent: true, opacity: 0.5 }));
+        scene.add(particles);
+
+        const barbell = new THREE.Group();
+        const ironMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.3 });
+        const redMat = new THREE.MeshStandardMaterial({ color: 0xFF2020, metalness: 0.5, roughness: 0.2 });
+        const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 6, 16), ironMat);
+        bar.rotation.z = Math.PI / 2; barbell.add(bar);
+        const addWeight = (x) => {
+            const w1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.3, 32), ironMat); w1.rotation.z = Math.PI/2; w1.position.x = x; barbell.add(w1);
+            const w2 = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.2, 32), redMat); w2.rotation.z = Math.PI/2; w2.position.x = x > 0 ? x+0.3 : x-0.3; barbell.add(w2);
+        };
+        addWeight(-2); addWeight(2);
+        scene.add(barbell);
+        camera.position.z = 6;
+        
+        scene.add(new THREE.PointLight(0xFF2020, 2, 100).position.set(0, 5, 5));
+        scene.add(new THREE.AmbientLight(0x404040, 2));
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', e => { mouseX = (e.clientX / window.innerWidth) * 2 - 1; mouseY = -(e.clientY / window.innerHeight) * 2 + 1; });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.001;
+            barbell.rotation.y += 0.01; barbell.rotation.x += 0.005;
+            camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 1.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>

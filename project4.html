@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAISON DORÉE | Luxury Dining</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root { --black: #0D0D0D; --gold: #C9A84C; --cream: #F5ECD7; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { font-family: 'Lato', sans-serif; background: var(--black); color: var(--cream); overflow-x: hidden; }
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; font-weight: 400; }
+        
+        #loader { position: fixed; inset: 0; background: var(--black); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 1px solid var(--gold); animation: flip 2s infinite ease-in-out; }
+        @keyframes flip { 0% { transform: perspective(120px) rotateX(0deg) rotateY(0deg); } 50% { transform: perspective(120px) rotateX(-180deg) rotateY(0deg); } 100% { transform: perspective(120px) rotateX(-180deg) rotateY(-180deg); } }
+        
+        .cursor-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.1s ease-out; }
+        .cursor-ring { width: 30px; height: 30px; border: 1px solid rgba(201,168,76,0.5); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.2s ease-out, width 0.2s, height 0.2s; }
+
+        nav { position: fixed; width: 100%; padding: 2rem 5%; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition: 0.4s; }
+        nav.scrolled { background: rgba(13,13,13,0.9); backdrop-filter: blur(10px); padding: 1rem 5%; border-bottom: 1px solid rgba(201,168,76,0.2); }
+        .logo { font-size: 2rem; color: var(--gold); text-decoration: none; letter-spacing: 4px; text-transform: uppercase; }
+        .nav-links a { color: var(--cream); text-decoration: none; margin-left: 2rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
+        #canvas-container { position: absolute; inset: 0; z-index: 0; opacity: 0.8; pointer-events: none; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; z-index: 10; background: radial-gradient(circle at center, transparent 0%, #0D0D0D 80%); }
+        .hero h1 { font-size: 6vw; letter-spacing: 10px; text-transform: uppercase; color: var(--gold); animation: flicker 4s infinite alternate; }
+        @keyframes flicker { 0%, 100% { text-shadow: 0 0 20px rgba(201,168,76,0.2); } 50% { text-shadow: 0 0 40px rgba(201,168,76,0.6); } }
+
+        /* Sticky Book Button */
+        .btn-sticky { position: fixed; right: -40px; top: 50%; transform: translateY(-50%) rotate(-90deg); background: var(--gold); color: var(--black); padding: 15px 30px; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; z-index: 1000; border: 1px solid var(--gold); transition: 0.3s; cursor: none;}
+        .btn-sticky:hover { background: var(--black); color: var(--gold); }
+
+        section { padding: 8rem 5%; position: relative; z-index: 10; }
+        .story-flex { display: flex; align-items: center; gap: 4rem; flex-wrap: wrap; }
+        .story-text { flex: 1; min-width: 300px; }
+        .story-img { flex: 1; min-width: 300px; position: relative; }
+        .story-img img { width: 100%; height: auto; border: 1px solid rgba(201,168,76,0.3); padding: 10px; }
+        .story-img::after { content: ''; position: absolute; inset: 0; background: rgba(201,168,76,0.1); }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-top: 4rem; perspective: 1000px; }
+        .menu-card { text-align: center; padding: 2rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.5s; transform-style: preserve-3d; background: rgba(255,255,255,0.02); }
+        .menu-card:hover { border-color: rgba(201,168,76,0.5); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .menu-card img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 2px solid var(--gold); transition: transform 0.5s; }
+        .menu-card:hover img { transform: scale(1.1) rotate(5deg); }
+        .menu-price { color: var(--gold); font-size: 1.5rem; font-family: 'Cormorant Garamond', serif; margin-top: 1rem; }
+
+        .chef-quote { padding: 8rem 5%; text-align: center; background: url('https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover fixed; position: relative; }
+        .chef-quote::before { content: ''; position: absolute; inset: 0; background: rgba(13,13,13,0.85); }
+        .quote-text { position: relative; z-index: 1; font-size: 2.5rem; font-style: italic; max-width: 800px; margin: 0 auto; color: var(--cream); line-height: 1.4; }
+
+        input, select { width: 100%; padding: 15px; margin-bottom: 20px; background: transparent; border: none; border-bottom: 1px solid rgba(201,168,76,0.3); color: var(--cream); font-family: 'Lato', sans-serif; transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-bottom-color: var(--gold); }
+        .btn-gold { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 15px 40px; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; width: 100%; cursor: none; }
+        .btn-gold:hover { background: var(--gold); color: var(--black); }
+
+        .float-btn { position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; text-decoration: none; z-index: 100; animation: pulse 2s infinite; pointer-events: auto;}
+    /* --- RESPONSIVE OVERRIDES --- */
+img { max-width: 100%; height: auto; display: block; }
+section { padding: clamp(4rem, 10vw, 8rem) 5%; }
+.hero h1 { font-size: clamp(3rem, 10vw, 8rem); }
+.story-flex, .input-group { flex-wrap: wrap; gap: 2rem; }
+.story-text, .story-img { flex: 1; min-width: min(100%, 300px); }
+.menu-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+input, select { flex: 1; min-width: 100% !important; }
+nav { flex-wrap: wrap; padding: clamp(1rem, 3vw, 2rem) 5%; gap: 1rem; }
+.quote-text { font-size: clamp(1.5rem, 5vw, 2.5rem); }
+.float-btn { width: clamp(50px, 8vw, 60px); height: clamp(50px, 8vw, 60px); font-size: clamp(1.5rem, 4vw, 2rem); }
+
+@media (max-width: 768px) {
+    .btn-sticky { top: auto; bottom: 0; right: 0; transform: none; width: 100%; text-align: center; position: fixed; z-index: 1001; }
+    .nav-links { display: none; }
+    section { padding-bottom: 100px; } /* Prevents bottom sticky button from covering form/footer */
+}
+    </style>
+</head>
+<body>
+    <div id="loader"><div class="spinner"></div></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-ring" id="cursor-ring"></div>
+    <div id="canvas-container"></div>
+
+    <nav id="navbar">
+        <a href="#" class="logo serif">Maison Dorée</a>
+        <div class="nav-links">
+            <a href="index.html">Portfolio</a>
+            <a href="#menu">Menu</a>
+            <a href="#reservations">Reservations</a>
+        </div>
+    </nav>
+
+    <a href="#reservations" class="btn-sticky">Book a Table</a>
+
+    <header class="hero">
+        <h1 class="serif" data-aos="fade-up" data-aos-duration="2000">Maison Dorée</h1>
+        <p data-aos="fade-up" data-aos-delay="500" style="font-size: 1.2rem; letter-spacing: 5px; text-transform: uppercase; margin-top: 2rem;">A Symphony of Taste</p>
+    </header>
+
+    <section id="story">
+        <div class="story-flex">
+            <div class="story-text" data-aos="fade-right">
+                <span style="color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem;">Our Heritage</span>
+                <h2 class="serif" style="font-size: 3.5rem; margin: 1rem 0 2rem; color: var(--gold);">Culinary Excellence in Casablanca</h2>
+                <p style="line-height: 1.8; color: #ccc;">Experience the harmonious blend of classic French techniques and vibrant Moroccan flavors. Set within a meticulously restored palace, Maison Dorée offers an atmosphere of unmatched elegance and a menu crafted for the connoisseur.</p>
+            </div>
+            <div class="story-img" data-aos="fade-left">
+                <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Restaurant Interior">
+            </div>
+        </div>
+    </section>
+
+    <section id="menu" style="background: #111;">
+        <div style="text-align: center;" data-aos="fade-up">
+            <h2 class="serif" style="font-size: 3.5rem; color: var(--gold);">Signature Menu</h2>
+            <p style="letter-spacing: 2px; color: #888; text-transform: uppercase; font-size: 0.8rem; margin-top: 1rem;">Curated by Chef Laurent</p>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-card" data-aos="fade-up">
+                <img src="https://images.unsplash.com/photo-1588168333986-5078d3ae3976?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Dish 1">
+                <h3 class="serif" style="font-size: 1.8rem;">Saffron Scallops</h3>
+                <p style="color: #aaa; margin-top: 1rem; font-size: 0.9rem;">Pan-seared Hokkaido scallops with Moroccan saffron emulsion and black caviar.</p>
+                <div class="menu-price">$45</div>
+            </div>
+            <div class="menu-card" data-aos="fade-up" data-aos-delay="100">
+                <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Wagyu & Truffle">
+                <h3 class="serif" style="font-size: 1.8rem;">Wagyu & Truffle</h3>
+                <p style="color: #aaa; margin-top: 1rem; font-size: 0.9rem;">A5 Wagyu beef tenderloin, smoked eggplant purée, and shaved Périgord truffle.</p>
+                <div class="menu-price">$120</div>
+            </div>
+            <div class="menu-card" data-aos="fade-up" data-aos-delay="200">
+                <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Golden Mille-Feuille">
+                <h3 class="serif" style="font-size: 1.8rem;">Golden Mille-Feuille</h3>
+                <p style="color: #aaa; margin-top: 1rem; font-size: 0.9rem;">Caramelized puff pastry, orange blossom vanilla cream, topped with 24k gold leaf.</p>
+                <div class="menu-price">$28</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="chef-quote">
+        <h2 class="quote-text serif" data-aos="zoom-in">"Cooking is not merely about feeding the body, but elevating the soul. Every plate is a canvas of our passion."</h2>
+        <p style="position: relative; z-index: 1; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-top: 2rem;">— Head Chef</p>
+    </section>
+
+    <section id="reservations" style="max-width: 800px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 3rem;" data-aos="fade-up">
+            <h2 class="serif" style="font-size: 3.5rem; color: var(--gold);">Reservations</h2>
+            <p style="color: #ccc; margin-top: 1rem;">Secure your table for an unforgettable evening.</p>
+        </div>
+        <form data-aos="fade-up" data-aos-delay="100">
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <input type="text" placeholder="Full Name" style="flex: 1; min-width: 250px;">
+                <input type="email" placeholder="Email Address" style="flex: 1; min-width: 250px;">
+            </div>
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <input type="date" style="flex: 1; min-width: 250px; color-scheme: dark;">
+                <select style="flex: 1; min-width: 250px;">
+                    <option value="" disabled selected>Number of Guests</option>
+                    <option value="1">1 Person</option><option value="2">2 People</option>
+                    <option value="3">3 People</option><option value="4">4+ People</option>
+                </select>
+            </div>
+            <button type="button" class="btn-gold" style="margin-top: 2rem;">Confirm Request</button>
+        </form>
+    </section>
+
+    <a href="mailto:hammouda.bouhlal06@gmail.com" class="float-btn" style="bottom: 100px; background: var(--gold); animation: none; color: var(--black);"><i class="fas fa-envelope"></i></a>
+    <a href="https://wa.me/212701559357" target="_blank" class="float-btn"><i class="fab fa-whatsapp"></i></a>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        window.addEventListener('load', () => { document.getElementById('loader').style.display = 'none'; AOS.init({ duration: 1000, once: true }); });
+
+        // Custom Cursor
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        document.addEventListener('mousemove', e => {
+            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+            setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 50);
+        });
+        document.querySelectorAll('a, button, .menu-card').forEach(el => {
+            el.addEventListener('mouseenter', () => { ring.style.width = '50px'; ring.style.height = '50px'; ring.style.backgroundColor = 'rgba(201,168,76,0.1)'; });
+            el.addEventListener('mouseleave', () => { ring.style.width = '30px'; ring.style.height = '30px'; ring.style.backgroundColor = 'transparent'; });
+        });
+
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 50) document.getElementById('navbar').classList.add('scrolled');
+            else document.getElementById('navbar').classList.remove('scrolled');
+        });
+
+        // Three.js Floating Gold Particles + Abstract Plate
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Particles
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(500 * 3);
+        for(let i=0; i<1500; i++) { pos[i] = (Math.random() - 0.5) * 15; }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.PointsMaterial({ size: 0.05, color: 0xC9A84C, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+        const particles = new THREE.Points(geo, mat);
+        scene.add(particles);
+
+        // Abstract Gold Ring (Plate representation)
+        const ringGeo = new THREE.TorusGeometry(3, 0.05, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xC9A84C, wireframe: true, transparent: true, opacity: 0.2 });
+        const torus = new THREE.Mesh(ringGeo, ringMat);
+        torus.rotation.x = Math.PI / 2 + 0.2;
+        scene.add(torus);
+
+        camera.position.z = 5;
+        
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', e => { mouseX = (e.clientX / window.innerWidth) * 2 - 1; mouseY = -(e.clientY / window.innerHeight) * 2 + 1; });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.002; particles.position.y = Math.sin(Date.now() * 0.001) * 0.2;
+            torus.rotation.z += 0.001;
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
