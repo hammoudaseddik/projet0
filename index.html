@@ -28,6 +28,16 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; perspective: 1000px; }
         .float-btn { position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; text-decoration: none; z-index: 100; animation: pulse 2s infinite; pointer-events: auto;}
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.7); } 70% { box-shadow: 0 0 0 20px rgba(0,0,0,0); } }
+    /* --- RESPONSIVE OVERRIDES --- */
+img { max-width: 100%; height: auto; display: block; }
+section { padding: clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 3rem); }
+.hero { padding: 0 clamp(1rem, 5vw, 3rem); }
+h1 { font-size: clamp(3rem, 10vw, 6rem); }
+h2 { font-size: clamp(2rem, 6vw, 3rem) !important; }
+.grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+nav { flex-wrap: wrap; padding: clamp(1rem, 3vw, 2rem); gap: 1rem; justify-content: center; }
+.back-btn { font-size: clamp(0.7rem, 2vw, 1rem); }
+.float-btn { width: clamp(50px, 8vw, 60px); height: clamp(50px, 8vw, 60px); font-size: clamp(1.5rem, 4vw, 2rem); }
     </style>
 </head>
 <body>
